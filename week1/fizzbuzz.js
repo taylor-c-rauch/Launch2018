@@ -5,7 +5,7 @@ function fizzbuzz(numbers) {
   // array where multiples of 3s and 5s become "Fizz" "Buzz" or "FizzBuzz"
   // using numbers.map()
   // YOUR CODE HERE
-  var newArr = numbers.map(function(num) {
+  let newArr = numbers.map(num => {
     if (num % 3 == 0 && num % 5 != 0) {
       return "Fizz";
     } else if (num % 5 == 0 && num % 3 != 0) {
