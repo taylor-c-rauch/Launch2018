@@ -22,6 +22,13 @@ class App extends Component {
     });
   }
   handleClick(e) {
+    if (
+      this.state.name === "" ||
+      this.state.company === "" ||
+      this.state.details === ""
+    ) {
+      return null;
+    }
     let form = {
       n: this.state.name,
       c: this.state.company,
