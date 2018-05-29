@@ -4,6 +4,7 @@ import "./App.css";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
+import firebase from "./firebase.js";
 
 class App extends Component {
   constructor() {
@@ -12,7 +13,8 @@ class App extends Component {
       name: "",
       company: "",
       details: "",
-      submitted: []
+      submitted: [],
+      removeId: ""
     };
   }
 
@@ -22,6 +24,7 @@ class App extends Component {
     });
   }
   handleClick(e) {
+    e.preventDefault();
     if (
       this.state.name === "" ||
       this.state.company === "" ||
@@ -29,15 +32,44 @@ class App extends Component {
     ) {
       return null;
     }
+    let itemsRef = firebase.database().ref("contracts");
     let form = {
       n: this.state.name,
       c: this.state.company,
       d: this.state.details
     };
-    let arr = this.state.submitted;
-    arr.push(form);
-    this.setState({ submitted: arr });
-    this.setState({ name: "", company: "", details: "" });
+    itemsRef
+      .push(form)
+      .then(this.setState({ name: "", company: "", details: "" }));
+  }
+  handleRemove(e) {
+    e.preventDefault();
+    if (this.state.removeId === "") {
+      return null;
+    }
+    this.removeItem(this.state.removeId);
+  }
+  removeItem(itemId) {
+    let itemsRef = firebase.database().ref("/contracts/" + itemId);
+    itemsRef.remove().then(this.setState({ removeId: "" }));
+  }
+
+  componentDidMount() {
+    const itemsRef = firebase.database().ref("contracts");
+    itemsRef.on("value", snapshot => {
+      let submitted = snapshot.val();
+      let arr = [];
+      for (let form in submitted) {
+        arr.push({
+          name: submitted[form].n,
+          company: submitted[form].c,
+          details: submitted[form].d
+        });
+      }
+      this.setState({
+        submitted: arr
+      });
+    });
   }
 
   render() {
@@ -58,6 +90,9 @@ class App extends Component {
           inputName={this.state.name}
           inputCompany={this.state.company}
           inputDetails={this.state.details}
+          updateRemove={newValue => this.updateField("removeId", newValue)}
+          removeButton={click => this.handleRemove(click)}
+          inputRemove={this.state.removeId}
         />
         <AppBar position="static" color="primary">
           <Toolbar>
@@ -68,10 +103,10 @@ class App extends Component {
         </AppBar>
         {this.state.submitted.map(obj => (
           <p style={{ textAlign: "left" }}>
-            <strong>Name:</strong> {obj.n} <br />
-            <strong>Company:</strong> {obj.c} <br />
+            <strong>Name:</strong> {obj.name} <br />
+            <strong>Company:</strong> {obj.company} <br />
             <strong>Details: </strong>
-            {obj.d}
+            {obj.details}
             <br />
           </p>
         ))}

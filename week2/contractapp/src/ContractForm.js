@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import MenuItem from "@material-ui/core/MenuItem";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
+import firebase from "firebase";
 
 export default class ContractForm extends Component {
   constructor(props) {
@@ -42,6 +43,21 @@ export default class ContractForm extends Component {
           onClick={e => this.props.subButton(e)}
         >
           SUBMIT
+        </Button>
+        <TextField
+          id="removeId"
+          label="Remove Contracts"
+          fullWidth
+          margin="normal"
+          value={this.props.inputRemove}
+          onChange={e => this.props.updateRemove(e.target.value)}
+        />
+        <Button
+          variant="raised"
+          color="default"
+          onClick={e => this.props.removeButton(e)}
+        >
+          REMOVE
         </Button>
         <br />
         <br />
